@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template
+from flask import render_template, redirect, url_for
 from flask import request
 from flask.ext.pymongo import PyMongo
 import datetime
@@ -9,7 +9,7 @@ mongo = PyMongo(app)
 
 @app.route('/')
 def index():
-    links = mongo.db.data.find();
+    links = mongo.db.data.find().sort('date', -1);
     return render_template('index.html', links=links)
 
 @app.route('/add', methods=['POST', 'GET'])
@@ -21,7 +21,7 @@ def add():
               "description": request.form['description'],
               "date": datetime.datetime.utcnow()}
       mongo.db.data.insert(data);
-      return render_template('index.html', links = mongo.db.data.find())
+      return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
