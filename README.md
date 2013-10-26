@@ -1,4 +1,4 @@
-gpsheatmap
+Puamana
 ==========
 
-Heatmaps for GPS devices
+Link Sharing
