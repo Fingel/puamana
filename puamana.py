@@ -11,7 +11,10 @@ mongo = PyMongo(app)
 @app.route('/')
 def index():
     today =  datetime.datetime.now();
-    offset = (today.weekday() - 1) % 7
+    if today.weekday() == 1:
+      offset = 7
+    else:
+      offset = (today.weekday() - 1) % 7
     last_tuesday = today - timedelta(days=offset)
     links = mongo.db.data.find({"date" : {"$gte": last_tuesday}}).sort('date', -1);
     return render_template('index.html', links=links, last=last_tuesday)
