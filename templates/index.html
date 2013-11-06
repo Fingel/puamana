@@ -56,7 +56,7 @@
           {% block content %}
           <h2>Links since
           {% if last %}
-            last Tuesday ({{last.day}}nd)
+            last Tuesday ({{last}})
           {% else %}
             all time
           {% endif %}
@@ -83,5 +83,7 @@
         <script src="{{ url_for('static', filename='js/vendor/bootstrap.min.js') }}"></script>
 
         <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+        {% block script %}
+        {% endblock %}
     </body>
 </html>

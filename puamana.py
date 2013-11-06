@@ -3,7 +3,8 @@ from flask import render_template, redirect, url_for
 from flask import request
 from flask.ext.pymongo import PyMongo
 import datetime
-from datetime import date, timedelta
+import urllib2
+import re
 
 app = Flask(__name__)
 mongo = PyMongo(app)
@@ -15,9 +16,10 @@ def index():
       offset = 7
     else:
       offset = (today.weekday() - 1) % 7
-    last_tuesday = today - timedelta(days=offset)
+    last_tuesday = today - datetime.timedelta(days=offset)
+    print last_tuesday.day
     links = mongo.db.data.find({"date" : {"$gte": last_tuesday}}).sort('date', -1);
-    return render_template('index.html', links=links, last=last_tuesday)
+    return render_template('index.html', links=links, last=str(last_tuesday.day) + suffix(last_tuesday.day))
 
 @app.route('/all')
 def all():
@@ -33,6 +35,21 @@ def add():
               "date": datetime.datetime.now()}
       mongo.db.data.insert(data);
       return redirect(url_for('index'))
+
+@app.route('/scrape/')
+def scrape():
+  p = re.compile('<p>([a-zA-z].*?)<\/p>', re.DOTALL)
+  try:
+    text = urllib2.urlopen(request.args['url']).read()
+  except:
+    return ""
+  if (p.search(text)):
+    return p.search(text).group()
+  else:
+    return ""
+
+def suffix(d):
+    return 'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')
 
 if __name__ == '__main__':
     app.run(debug=True)
